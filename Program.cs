@@ -35,9 +35,10 @@ namespace Ploskost_popolam
 
         static bool EqualHalfPlanes(Point[] points)
         {
-            var averageX = points.Average(p => p.X);
-            var leftPoints = points.Where(p => p.X <= averageX).OrderBy(p => p.Y);
-            var rightPoints = points.Where(p => p.X > averageX).OrderBy(p => p.Y);
+            var middleXPoint = (double)(points.Select(p => p.X).Max() + points.Select(p=> p.X).Min())/2;
+
+            var leftPoints = points.Where(p => p.X < middleXPoint).OrderBy(p => p.Y);
+            var rightPoints = points.Where(p => p.X > middleXPoint).OrderBy(p => p.Y);
 
             if (leftPoints.Count() != rightPoints.Count()
                 || !leftPoints.Select(p => p.Y).SequenceEqual(rightPoints.Select(p => p.Y)))
@@ -45,7 +46,7 @@ namespace Ploskost_popolam
 
             for (int i = 0; i < rightPoints.Count(); i++)
             {
-                if (averageX - leftPoints.OrderBy(p=>p.X).ElementAt(i).X != rightPoints.OrderByDescending(p => p.X).ElementAt(i).X - averageX) return false;
+                if (middleXPoint - leftPoints.OrderBy(p=>p.X).ElementAt(i).X != rightPoints.OrderByDescending(p => p.X).ElementAt(i).X - middleXPoint) return false;
             }
             return true;
         }
