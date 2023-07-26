@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Ploskost_popolam
 {
@@ -37,16 +38,19 @@ namespace Ploskost_popolam
         {
             var middleXPoint = (double)(points.Select(p => p.X).Max() + points.Select(p=> p.X).Min())/2;
 
-            var leftPoints = points.Where(p => p.X < middleXPoint).OrderBy(p => p.Y).OrderBy(p => p.X).ToArray();
-            var rightPoints = points.Where(p => p.X > middleXPoint).OrderBy(p => p.Y).OrderByDescending(p=>p.X).ToArray();
+            var leftPoints = new HashSet<Point>();
+            var rightPoints = new HashSet<Point>();
 
-            if (leftPoints.Count() != rightPoints.Count()
-                || !leftPoints.Select(p => p.Y).SequenceEqual(rightPoints.Select(p => p.Y)))
-                return false;
-
-            for (int i = 0; i < rightPoints.Count(); i++)
+            foreach (Point point in points)
             {
-                if (middleXPoint - leftPoints[i].X != rightPoints[i].X - middleXPoint) return false;
+                if (point.X < middleXPoint) leftPoints.Add(point);
+                else if (point.X > middleXPoint) rightPoints.Add(point);
+            }
+            if (leftPoints.Count != rightPoints.Count) return false;
+            
+            foreach(Point p in leftPoints)
+            {
+                if(!rightPoints.Contains(new Point((int)(middleXPoint + (middleXPoint - p.X)), p.Y))) return false;
             }
             return true;
         }
